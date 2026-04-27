@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    <div class = "vinyl">
+        {% if vinyl.vinyl_image %}
+            <img class="vinylImage" src = "{{ url_for('static', filename = 'uploads/' + vinyl.vinyl_image) }}">
+        {% endif %}
+        <table>
+            <tbody>
+                <tr>
+                    <th>
+                        <h2>Vinyl Id</h2>
+                    </th>
+                    <td>
+                        {{ vinyl.vinyl_id }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <h2>Artist</h2>
+                    </th>
+                    <td>
+                        {{ vinyl.vinyl_artist }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <h2>Vinyl Name</h2>
+                    </th>
+                    <td>
+                        {{ vinyl.vinyl_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <h2>Genre</h2>
+                    </th>
+                    <td>
+                        {{ vinyl.vinyl_genre }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <h2>Release Year</h2>
+                    </th>
+                    <td>
+                        {{ vinyl.vinyl_year }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

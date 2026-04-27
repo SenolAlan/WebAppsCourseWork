@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Your Basket</h1>
+
+{% for item in basket_items %}
+    <div class="basketVinyl">
+        <p>{{ item.vinyl.vinyl_artist }} - {{ item.vinyl.vinyl_name }}</p>
+        <p>£{{ "%.2f"|format(item.subtotal) }}</p>
+    </div>
+    <div class="controls">
+        <button onclick="updateBasket('decrease', '{{ item.vinyl.vinyl_id }}')">-</button>
+
+        <span id="qty-{{ item.vinyl.vinyl_id }}">{{ item.quantity }}</span>
+
+        <button onclick="updateBasket('increase', '{{ item.vinyl.vinyl_id }}')">+</button>
+
+        <button onclick="updateBasket('remove', '{{ item.vinyl.vinyl_id }}')">🗑</button>
+    </div>
+{% endfor %}
+
+<h3>Total: £{{ "%.2f"|format(total) }}</h3>
+{% endblock %}

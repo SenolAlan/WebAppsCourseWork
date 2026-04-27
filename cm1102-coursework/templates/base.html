@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %} Vinyl Store {% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+
+    <body class="body" onload="resetGallery()">
+        <nav class="navbar">
+            <div class="navbarContainer">
+                <div class="logo">
+                    <a href="{{ url_for ('index') }}"><img src="{{ url_for('static', filename='Logo.png') }}" alt=""></a>
+                </div>
+                <div class="searchWrapper">
+                    <form class="search">
+                        <input placeholder="Search for Music...">
+                        <button type="submit" class="submitButton">
+                            <img src="{{ url_for('static', filename='search.png') }}" class="searchIcon">
+                        </button>
+                    </form>
+                </div>
+                <div class="navbarNavigation">
+                    <a href="{{ url_for ('index') }}">Explore Discographies</a>
+                    <a href="{{ url_for ('index') }}">Sell Music</a>
+                </div>
+                <div class="basketWrapper">
+                    <div class="basket">
+                        <a href="{{ url_for('basket') }}"><img src="{{ url_for('static', filename='shopping-basket-svgrepo-com.svg') }}" alt=""></a>
+                    </div>
+                </div>
+                <div class="loginWrapper">
+                    <div class="login">
+                        <button class="loginButton">Login / Sign Up</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% block content %}
+        {% endblock %}
+    </body>
+
+    <script>
+        function resetAllGalleries() {
+            const galleries = document.querySelectorAll(".gallery");
+            galleries.forEach(gallery => { gallery.scrollLeft = 0; });
+        }
+
+        function scrollGallery(button, direction) {
+            const gallery = button.parentElement.querySelector(".gallery");
+            gallery.scrollLeft += direction * 320;
+        }
+        document.addEventListener("DOMContentLoaded", resetAllGalleries);
+
+        function updateBasket(action, id) {
+            fetch(`/basket/${action}/${id}`, {method: "POST"}).then(() => {location.reload()});
+        }
+    </script>
+
+</html>

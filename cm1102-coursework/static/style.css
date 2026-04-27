@@ -1,0 +1,329 @@
+.body {
+    padding: 0px;
+    margin: 0px;
+    font-family: Consolas, monospace;
+}
+
+h1 {
+    padding: 0;
+    margin: 0;
+}
+
+/* ------------------------------------------------------ */
+
+.navbar {
+    background-color: whitesmoke;
+    width: 100%;
+    height: 100px;
+}
+
+.logo img {
+    position: relative;
+    height: 80px;
+    left: 0;
+    top: 0;
+}
+
+.navbarContainer {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: left;
+}
+
+.navbarNavigation {
+    display: flex;
+    margin-left: 50px;
+}
+
+.navbarNavigation a {
+    display: flex;
+    padding: 20px 25px 20px 25px;
+    border-radius: 8px;
+    background-color: whitesmoke;
+    margin-right: 50px;
+    color: rgb(29, 29, 29);
+    text-decoration: none;
+    font-family: Consolas, monospace;
+    font-size: 18px;
+    transition: 0.2s;
+}
+
+.navbarNavigation a:hover{
+    background-color: rgb(225, 225, 225);
+}
+
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 15px;
+    margin-left: 20px;
+}
+
+.search {
+    margin: 0 auto;
+    display: flex;
+}
+
+.search input {
+    height: 30px;
+    border: 0;
+    width: 400px;
+}
+
+.search input:focus {
+    outline: 0;
+}
+
+.submitButton {
+    background-color: transparent;
+    border: 0;
+}
+
+.submitButton:hover {
+    cursor: pointer;
+}
+
+.searchIcon {
+    height: 30px;
+}
+
+.basketWrapper {
+    margin-left: auto;
+}
+
+.basket {
+    margin: 0 auto;
+}
+
+.basket img {
+    padding: 10px;
+    border-radius: 8px;
+    height: 30px;
+    right: 50px;
+    top: 25px;
+    transition: 0.2s;
+}
+
+.basket img:hover {
+    background-color: rgb(225, 225, 225);
+}
+
+.loginWrapper {
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.login {
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.loginButton {
+    border: 1px solid rgb(29, 29, 29);
+    border-radius: 30px;
+    background-color: transparent;
+    height: 40px;
+    width: 160px;
+    transition: 0.2s;
+}
+
+.loginButton:hover {
+    background-color: rgb(29, 29, 29);
+    color: whitesmoke;
+    cursor: pointer;
+}
+
+
+/* ------------------------------------------------------ */
+
+.contentContainer1 {
+    width: 100%;
+    height: 100%;
+    padding-bottom: 50px;
+}
+
+.contentContainer2 {
+    width: 100%;
+    height: 100%;
+}
+
+/* ------------------------------------------------------ */
+
+.recentlyAdded {
+    margin: auto;
+    max-width: 1500px;
+}
+
+.header {
+    padding-top: 40px;
+    margin-left: 40px;
+}
+
+.headerBox {
+    padding: 10px 10px 10px 10px;
+    border-radius: 15px 15px 0px 0px;
+    background-color: rgb(29, 29, 29);
+    max-width: 350px;
+}
+
+.header h1 {
+    color: whitesmoke;
+    font-weight: 300;
+    margin-left: 10px;
+    font-size: 25px;
+}
+
+.vinylContainer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 10px 0px 10px 0px;
+    text-decoration: none;
+}
+
+.gallery {
+    display: flex;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    flex: 1;
+    min-width: 0;
+    height: 440px;
+}
+
+.galleryButton {
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    font-family: Consolas, monospace;
+    margin: 0px 10px;
+    width: 30px;
+    height: 30px;
+    background-color: rgb(29, 29, 29);
+    color: whitesmoke;
+    border: 0;
+    border-radius: 50%;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.galleryButton:hover {
+    background-color: rgb(225, 225, 225);
+    color: rgb(29, 29, 29);
+    cursor: pointer;
+}
+
+.vinyl {
+    transition: 0.2s;
+    background-color: whitesmoke;
+    margin: 10px 30px 0px 5px;
+    padding: 10px 10px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 270px;
+    height: 90%;
+    box-shadow: 0px 2px 5px rgb(225, 225, 225);
+    border-radius: 8px;
+}
+
+.vinyl:hover {
+    transition: 0.2s;
+    background-color: rgb(225, 225, 225);
+}
+
+.vinyl a {
+    text-decoration: none;
+    color: rgb(29, 29, 29);
+}
+
+.addToBasket {
+    margin-top: 10px;
+}
+
+.addToBasketButton {
+    border-radius: 8px;
+    padding: 5px;
+    font-family: Consolas, monospace;
+    font-size: 15px;
+    background-color: rgb(225, 225, 225);
+    color: rgb(29, 29, 29);
+    border: 0;
+}
+
+.addToBasketButton:hover {
+    background-color: rgb(29, 29, 29);
+    color: whitesmoke;
+    cursor: pointer;
+}
+
+.vinylImage {
+    display: block;
+    margin: 0 auto;
+    height: 250px;
+    max-width: 250px;
+    object-fit: cover;
+}
+
+.vinyl table {
+    margin: 0 auto;
+    width: 100%;
+}
+
+.vinylArtist {
+    width: 100%;
+    text-align: left;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.vinylName {
+    width: 100%;
+    text-align: left;
+    font-weight: 400;
+}
+
+.vinylImpact {
+    text-align: left;
+    font-size: 10px;
+}
+
+.vinylPrice {
+    text-align: center;
+    padding-top: 20px;
+}
+
+/* ------------------------------------------------------ */
+
+.searchArea {
+    margin: auto;
+    max-width: 1400px;
+    min-height: 500px;
+}
+
+.searchHeaderBox {
+    padding-top: 40px;
+}
+
+.searchHeader {
+    padding: 10px 10px 10px 10px;
+    border-radius: 15px 15px 0px 0px;
+    background-color: rgb(29, 29, 29);
+    max-width: 350px;
+}
+
+.searchHeaderBox h1 {
+    color: whitesmoke;
+    font-weight: 300;
+    margin-left: 10px;
+    font-size: 25px;
+}
+
+.searchBox {
+    width: 100%;
+    min-height: 500px;
+    background-color: whitesmoke;
+}
