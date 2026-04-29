@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, session
+from flask import Flask, render_template, redirect, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -24,7 +24,7 @@ class VinylsDb(db.Model):
     vinyl_image = db.Column(db.String(255))
     vinyl_price = db.Column(db.Float, nullable=True)
     vinyl_impact = db.Column(db.String(32))
-    vinyl_stock = db.column(db.Integer)
+    vinyl_stock = db.Column(db.Integer)
 
 class VinylForm(FlaskForm):
     vinyl_artist = StringField('Artist Name', validators = [DataRequired(), Length(min = 3, max = 30)])
@@ -34,7 +34,7 @@ class VinylForm(FlaskForm):
     vinyl_image = FileField('Vinyl Image', validators= [FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')])
     vinyl_price = FloatField('Vinyl Price', validators = [NumberRange(min = 1, max = 2000)])
     vinyl_impact = StringField('Vinyl Impact', validators = [DataRequired(), Length(min = 0, max = 5)])
-    vinyl_stock = IntegerField('Vinyl Stock', validators = [data_required(), NumberRange(min = 1, max = 100)])
+    vinyl_stock = IntegerField('Vinyl Stock', validators = [data_required(), NumberRange(min = 0, max = 100)])
     submit = SubmitField('Submit')
 
 class RemoveVinylForm(FlaskForm):
@@ -47,6 +47,38 @@ def index():
     lastest_vinyls = VinylsDb.query.order_by(VinylsDb.vinyl_id.desc()).limit(5).all()
     most_expensive = VinylsDb.query.order_by(VinylsDb.vinyl_price.desc()).limit(5).all()
     return render_template('index.html', vinyls = vinyl, latest = lastest_vinyls, expensive = most_expensive)
+
+@app.route('/search')
+def search():
+    query = request.args.get("q", "")
+
+    if query:
+        results = VinylsDb.query.filter(db.or_(VinylsDb.vinyl_artist.ilike(f"%{query}%"), VinylsDb.vinyl_name.ilike(f"%{query}%"))).all()
+        return [{"img": v.vinyl_image, "id": v.vinyl_id, "name": v.vinyl_name, "artist": v.vinyl_artist, "impact": v.vinyl_impact, "id": v.vinyl_id} for v in results]
+    
+@app.route('/orderedSort')
+def orderedSort():
+    query = request.args.get("q", " ")
+    order = request.args.get("order", "")
+    selection = request.args.get("selection", "")
+
+    results = VinylsDb.query.all()
+    if query or order or selection:
+        columns = {
+            "price": VinylsDb.vinyl_price,
+            "date": VinylsDb.vinyl_year,
+            "name": VinylsDb.vinyl_artist,
+            "impact": VinylsDb.vinyl_impact
+        }
+        column = columns.get(selection)
+        base_query = results = VinylsDb.query.filter(db.or_(VinylsDb.vinyl_artist.ilike(f"%{query}%"), VinylsDb.vinyl_name.ilike(f"%{query}%")))
+
+        if column:
+            order = getattr(column, order)()
+            base_query = base_query.order_by(order)
+
+        results = base_query.all()
+    return [{"img": v.vinyl_image, "id": v.vinyl_id, "name": v.vinyl_name, "artist": v.vinyl_artist, "impact": v.vinyl_impact, "id": v.vinyl_id, "price": v.vinyl_price} for v in results]
 
 @app.route('/release/<int:id>')
 def Vinyl(id):
@@ -62,7 +94,7 @@ def basket():
     total = 0
 
     for id, quantity in basket.items():
-        vinyl = VinylsDb.query.get(int(id))
+        vinyl = db.session.get(VinylsDb, int(id))
 
         if vinyl:
             subtotal = (vinyl.vinyl_price or 0) * quantity
@@ -95,18 +127,43 @@ def add_to_basket(id):
 def increase(id):
     basket = session.get('basket', {})
     id = str(id)
+    vinyl = db.session.get(VinylsDb, int(id))
 
-    count = VinylsDb.query.filter_by(vinyl_id = id).count()
-
-    if basket[id] <= count:
+    if basket[id] < vinyl.vinyl_stock:
         basket[id] += 1
-    else: 
-        basket[id] = basket[id]
+    elif basket[id] >= vinyl.vinyl_stock:
+        basket[id] = vinyl.vinyl_stock
     session['basket'] = basket
     session.modified = True
 
+    return redirect('/')
 
+@app.route('/basket/decrease/<int:id>', methods=['POST'])
+def decrease(id):
+    basket = session.get('basket', {})
+    id = str(id)
+    vinyl = db.session.get(VinylsDb, int(id))
 
+    if id in basket:
+        if basket[id] <= 1:
+            basket.pop(id)
+        else:
+            basket[id] -= 1
+
+    session['basket'] = basket
+    return redirect('/')
+        
+@app.route('/basket/remove/<int:id>', methods=['POST'])
+def remove(id):
+    basket = session.get('basket', {})
+    id = str(id)
+    vinyl = db.session.get(VinylsDb, int(id))
+
+    if id in basket:
+            basket.pop(id)
+            
+    session['basket'] = basket
+    return redirect('/')
 
 @app.route('/add', methods=['GET', 'POST'])
 def AddVinyl():

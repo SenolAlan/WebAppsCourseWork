@@ -45,7 +45,7 @@ h1 {
     color: rgb(29, 29, 29);
     text-decoration: none;
     font-family: Consolas, monospace;
-    font-size: 18px;
+    font-size: 20px;
     transition: 0.2s;
 }
 
@@ -59,18 +59,20 @@ h1 {
     background-color: white;
     padding: 10px 20px;
     border-radius: 15px;
-    margin-left: 20px;
+    margin-left: 40px;
+    min-width: 400px;
 }
 
 .search {
     margin: 0 auto;
     display: flex;
+    min-width: 100%;
 }
 
 .search input {
     height: 30px;
     border: 0;
-    width: 400px;
+    width: 100%;
 }
 
 .search input:focus {
@@ -88,6 +90,73 @@ h1 {
 
 .searchIcon {
     height: 30px;
+}
+
+.navbarSearchResults {
+    display: grid;
+    position: relative;
+    max-width: 450px;
+    margin-left: 365px;
+    padding: 0px;
+    overflow-y: auto;
+    height: auto;
+    max-height: 600px;
+    background-color: whitesmoke;
+    z-index: 100;
+    box-shadow: 0 8px 25px rgba(29, 29, 29, 0.2);
+    transition: 0.2s;
+    opacity: 1;
+
+}
+
+.navbarSearchResults.active {
+    padding: 15px 25px 25px 25px;
+    border-radius: 0px 0px 8px 8px;
+}
+
+.navbarSearchResults.hidden {
+    opacity: 0;  
+}
+
+.navbarSearchResults a {
+    text-decoration: none;
+    display: flex;
+    color: rgb(29, 29, 29);
+}
+
+.navbarSearchResultDiv {
+    display: flex;
+    height: 80px;
+    padding: 10px;
+    margin: 10px 0px;
+    border-top: 1px solid rgb(225, 225, 225);
+    border-bottom: 1px solid rgb(225, 225, 225);
+    border-width: 100%;
+    transition: 0.2s;
+}
+
+.navbarSearchResultDiv:hover {
+    transform: translateY(2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+}
+
+.resultImage {
+    position: relative;
+    left: 0;
+    width: 80px;
+    transition: 0.2s;
+}
+
+.resultText {
+    padding: 0px 10px;
+    transition: 0.2s;
+}
+
+.resultText h3 {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 100;
 }
 
 .basketWrapper {
@@ -122,18 +191,21 @@ h1 {
 }
 
 .loginButton {
-    border: 1px solid rgb(29, 29, 29);
-    border-radius: 30px;
+    border: 0;
+    border-radius: 8px;
     background-color: transparent;
-    height: 40px;
-    width: 160px;
+    height: 50px;
+    width: 50px;
     transition: 0.2s;
 }
 
 .loginButton:hover {
-    background-color: rgb(29, 29, 29);
-    color: whitesmoke;
+    background-color: rgb(225, 225, 225);
     cursor: pointer;
+}
+
+.loginImg {
+    height: 35px;
 }
 
 
@@ -143,6 +215,7 @@ h1 {
     width: 100%;
     height: 100%;
     padding-bottom: 50px;
+    z-index: 0;
 }
 
 .contentContainer2 {
@@ -302,6 +375,7 @@ h1 {
     margin: auto;
     max-width: 1400px;
     min-height: 500px;
+    margin-bottom: 100px;
 }
 
 .searchHeaderBox {
@@ -323,7 +397,104 @@ h1 {
 }
 
 .searchBox {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     min-height: 500px;
     background-color: whitesmoke;
+}
+
+.searchHeaderContainer {
+    display: flex;
+    min-width: 100%;
+    min-height: 100px;
+    background-color: rgb(225, 225, 225);
+    border-radius: 0px 0px 8px 8px;
+}
+
+#searchWrapper2 {
+    display: flex;
+    max-width: 40%;
+    margin-top: 20px;
+    max-height: 35px;
+}
+
+.searchSort {
+    display: flex;
+    position: relative;
+    max-width: 30%;
+    margin-left: 40px;
+    transition: 0.2s;
+}
+
+.sortSelect {
+    font-family: Consolas, monospace;
+    padding: 17px 25px;
+    background-color: whitesmoke;
+    border: 0;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.sortSelect:hover {
+    cursor: pointer;
+}
+
+.sortOrderButton {
+    border: 0px;
+    border-radius: 8px;
+    background-color: transparent;
+    margin-left: 20px;
+    
+}
+
+.sortOrderButton:hover {
+    background-color: whitesmoke;
+    cursor: pointer;
+}
+
+.sortOrderButton img{
+    width: 35px;
+    transition: transform 0.3s ease; 
+}
+
+.orderedResults{
+    display: flex;
+    flex-wrap: wrap;
+    opacity: 1;
+    transition: 0.2s;
+    text-align: center;
+}
+
+.orderedResults.active {
+    padding: 15px 25px 25px 25px;
+    border-radius: 0px 0px 8px 8px;
+}
+
+.orderedResults.hidden {
+    opacity: 0;  
+}
+
+.orderedResults a {
+    text-decoration: none;
+    align-items: center;
+    color: rgb(29, 29, 29);
+}
+
+#orderedResult {
+    width: 300px;
+    height: 300px;
+    margin: auto;
+    text-align: center;
+    justify-content: center;
+    border: 0;
+    margin-bottom: 10px;
+}
+
+#orderedResultImage {
+    margin: auto;
+    display: block;
+    height: 200px;
+    width: auto;
+    margin-bottom: 10px;
 }

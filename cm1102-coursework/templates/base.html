@@ -14,13 +14,14 @@
                     <a href="{{ url_for ('index') }}"><img src="{{ url_for('static', filename='Logo.png') }}" alt=""></a>
                 </div>
                 <div class="searchWrapper">
-                    <form class="search">
-                        <input placeholder="Search for Music...">
+                    <form class="search" autocomplete="off">
+                        <input placeholder="Search for Music..." id="searchBox" type="text" name="search" placeholder="Search vinyls..." value="{{ search_query or '' }}" autocomplete="off">
                         <button type="submit" class="submitButton">
                             <img src="{{ url_for('static', filename='search.png') }}" class="searchIcon">
                         </button>
                     </form>
                 </div>
+                
                 <div class="navbarNavigation">
                     <a href="{{ url_for ('index') }}">Explore Discographies</a>
                     <a href="{{ url_for ('index') }}">Sell Music</a>
@@ -32,30 +33,109 @@
                 </div>
                 <div class="loginWrapper">
                     <div class="login">
-                        <button class="loginButton">Login / Sign Up</button>
+                        <button class="loginButton"><img src="{{ url_for('static', filename='Profile.png')}}" class="loginImg"></button>
                     </div>
                 </div>
             </div>
+            <div id="navbarSearchResults" class="navbarSearchResults"></div>
         </nav>
         {% block content %}
         {% endblock %}
     </body>
 
     <script>
-        function resetAllGalleries() {
+        document.addEventListener("DOMContentLoaded", resetAll);
+        document.addEventListener("DOMContentLoaded", updateResults);
+
+        function resetAll() {
             const galleries = document.querySelectorAll(".gallery");
             galleries.forEach(gallery => { gallery.scrollLeft = 0; });
+
+            const search = document.getElementById("searchBox");
+            search.value = "";
         }
 
-        function scrollGallery(button, direction) {
+        function scrollGallery(button, direction){
             const gallery = button.parentElement.querySelector(".gallery");
             gallery.scrollLeft += direction * 320;
         }
-        document.addEventListener("DOMContentLoaded", resetAllGalleries);
+        
 
-        function updateBasket(action, id) {
+        function updateBasket(action, id){
             fetch(`/basket/${action}/${id}`, {method: "POST"}).then(() => {location.reload()});
         }
+
+        document.getElementById("searchBox").addEventListener("focus", function() {
+            let resultsDiv = document.getElementById("navbarSearchResults");
+            resultsDiv.classList.remove("hidden");
+        });
+        
+        document.getElementById("searchBox").addEventListener("blur", function() {
+            let resultsDiv = document.getElementById("navbarSearchResults");
+            resultsDiv.classList.add("hidden");
+        });
+
+        document.getElementById("searchBox").addEventListener("input", function() {
+            let query = this.value;
+            let resultsDiv = document.getElementById("navbarSearchResults");
+
+            if (query === "") {
+                resultsDiv.classList.remove("active");
+                resultsDiv.innerHTML = "";
+                return;
+            }
+
+            resultsDiv.classList.add("active");
+
+            fetch(`/search?q=${query}`).then(res => res.json()).then(data => {
+                resultsDiv.innerHTML = "";
+                data.forEach(item => {resultsDiv.innerHTML += `<div class="navbarSearchResultDiv"><a href="/release/${item.id}"><img class="resultImage" src="/static/uploads/${item.img}"><div class="resultText"><strong>${item.name}</strong><br>${item.artist}<br><h3>${item.impact} kg Co2</h3></div></a></div>`;
+                });
+            });
+        });
+
+        const searchBox = document.getElementById("searchBoxOrdered");
+        const resultsDiv = document.getElementById("orderedResults");
+        const button = document.getElementById("sortOrderButton");
+        const selection = document.getElementById("sort");
+
+        
+        searchBox.addEventListener("input", updateResults);
+        button.addEventListener("click", updateResults)
+        selection.addEventListener("change", updateResults);
+
+        function updateResults(){
+            const query = searchBox.value;
+            const order = sortOrder();
+
+            resultsDiv.classList.add("active");
+
+            fetch(`/orderedSort?q=${query}&order=${order}&selection=${selection.value}`).then(res => res.json()).then(data => {
+                resultsDiv.innerHTML = "";
+                data.forEach(item => {resultsDiv.innerHTML += `<div class="navbarSearchResultDiv" id="orderedResult"><a href="/release/${item.id}"><img class="resultImage" id="orderedResultImage" src="/static/uploads/${item.img}"><div class="resultText" id="orderedResultText"><strong>${item.name}</strong><br>${item.artist}<br><h3>${item.impact} kg Co2</h3><br>£${item.price.toFixed(2)}<br></div></a></div>`;
+                });
+            });
+        }
+
+        function sortOrder(){
+            const img = document.querySelector(`#${button.id} img`)
+            if (img.style.transform.includes("180deg")) {
+                return "desc"
+            } else {
+                return "asc"
+            }
+        }
+
+        function rotateButton(buttonId){
+            const img = document.querySelector(`#${buttonId} img`)
+            if (img.style.transform.includes("180deg")) {
+                img.style.transform = "rotate(0deg)";
+            } else {
+                img.style.transform = "rotate(180deg)";
+            }
+        }
+
+
     </script>
 
 </html>

@@ -65,7 +65,26 @@
                 </div>
             </div>
             <div class="searchBox">
-                
+                <div class="searchHeaderContainer">
+                    <div class="searchWrapper" id="searchWrapper2">
+                        <form class="search" autocomplete="off">
+                            <input placeholder="Search for Music..." id="searchBoxOrdered" type="text" name="search" placeholder="Search vinyls..." value="{{ search_query or '' }}" autocomplete="off">
+                            <button type="submit" class="submitButton">
+                                <img src="{{ url_for('static', filename='search.png') }}" class="searchIcon">
+                            </button>
+                        </form>
+                        <form class="searchSort">
+                            <select name="sort" id="sort" class="sortSelect">
+                                <option value="price">Price</option>
+                                <option value="date">Release Date</option>
+                                <option value="name">Artist Name</option>
+                                <option value="impact">Env. Inpact</option>
+                            </select>
+                            <button type="button" value="order" class="sortOrderButton" id="sortOrderButton" onclick="rotateButton(this.id)"><img src="{{ url_for('static', filename='Arrow.png') }}"></button>
+                        </form>
+                    </div>
+                </div>
+                <div id="orderedResults" class="orderedResults"></div>
             </div>
         </div>
     </div>
