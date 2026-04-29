@@ -1,20 +1,27 @@
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import *
 from wtforms.validators import *
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'top secret!'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vinyls.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vinyls.db'
+#app.config["SQLALCHEMY_BINDS"] = {"users": "sqlite:///users.db", "vinyls": "sqlite:///vinyls.db"}
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
+lm = LoginManager(app)
+lm.login_view = 'login'
 
 class VinylsDb(db.Model):
+    #__bind_key__ = "vinyls"
     __tablename__ = 'VinylsDb'
     vinyl_id = db.Column(db.Integer, primary_key=True)
     vinyl_artist = db.Column(db.String(32))
@@ -40,8 +47,64 @@ class VinylForm(FlaskForm):
 class RemoveVinylForm(FlaskForm):
     remove_id = IntegerField('Vinyl Id to Remove', validators = [DataRequired(), NumberRange(min = 1)])
     submit = SubmitField('Submit')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(3, 16)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember me')
+    submit = SubmitField('Submit')
+
+class User(UserMixin, db.Model):
+    #__bind_key__ = "users"
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(16), index=True, unique=True)
+    password_hash = db.Column(db.String(64))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
     
-@app.route('/')
+    @staticmethod
+    def register(username, password):
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return user
+
+    def __repr__(self):
+        return '<User {0}>'.format(self.username)
+    
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.verify_password(form.password.data):
+            return redirect(url_for('login', **request.args))
+        login_user(user, form.remember_me.data)
+        return redirect(request.args.get('next') or url_for('index'))
+    return render_template('login.html', form = form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/protected')
+@login_required
+def protected():
+    return render_template('protected.html')
+    
+@app.route('/', methods=['GET', 'POST'])
 def index():
     vinyl = VinylsDb.query.all()
     lastest_vinyls = VinylsDb.query.order_by(VinylsDb.vinyl_id.desc()).limit(5).all()
@@ -216,5 +279,13 @@ def RemoveVinyl():
     return render_template('remove.html', form=form)
 
 
+
+
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        db.session.add(User(...))
+        db.session.add(VinylsDb(...))
+        db.session.commit()
     app.run(debug=True,port=5050)
