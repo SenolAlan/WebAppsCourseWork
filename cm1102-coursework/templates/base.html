@@ -34,7 +34,7 @@
                 <div class="loginWrapper">
                     <div class="login">
                         {% if current_user.is_authenticated %}
-                            <button class="loginButton"><a href="{{ url_for('logout') }}"><img src="{{ url_for('static', filename='Profile.png')}}" class="loginImg"></a></button>
+                            <button class="loginButton"><a href="{{ url_for('profile') }}"><img src="{{ url_for('static', filename='uploads/profile_pictures/' + current_user.profile_picture)}}" class="loginImg"></a></button>
                         {% else %}
                             <button class="loginButton"><a href="{{ url_for('login') }}"><img src="{{ url_for('static', filename='Profile.png')}}" class="loginImg"></a></button>
                         {% endif %}

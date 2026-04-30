@@ -2,53 +2,52 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
-    <div class = "vinyl">
-        {% if vinyl.vinyl_image %}
-            <img class="vinylImage" src = "{{ url_for('static', filename = 'uploads/' + vinyl.vinyl_image) }}">
-        {% endif %}
-        <table>
-            <tbody>
-                <tr>
-                    <th>
-                        <h2>Vinyl Id</h2>
-                    </th>
-                    <td>
-                        {{ vinyl.vinyl_id }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <h2>Artist</h2>
-                    </th>
-                    <td>
-                        {{ vinyl.vinyl_artist }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <h2>Vinyl Name</h2>
-                    </th>
-                    <td>
-                        {{ vinyl.vinyl_name }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <h2>Genre</h2>
-                    </th>
-                    <td>
-                        {{ vinyl.vinyl_genre }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <h2>Release Year</h2>
-                    </th>
-                    <td>
-                        {{ vinyl.vinyl_year }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="vinylPageContainer">
+        <div class = "vinylPageHeader">
+            {% if vinyl.vinyl_image %}
+                <img class="vinylPageImage" src = "{{ url_for('static', filename = 'uploads/' + vinyl.vinyl_image) }}">
+            {% endif %}
+            <div class="vinylTableContainer">
+                <div class="vinylTable">
+                    <div class="vinylRow">
+                        <h2>{{ vinyl.vinyl_artist }}</h2>
+                        <h2> - </h2>
+                        <h2>{{ vinyl.vinyl_name }}</h2>
+                    </div>
+                    <div class="vinylRow">
+                        <div class="vinylEx"><h3>Genre:</h3></div>
+                        <h3>{{ vinyl.vinyl_genre }}</h3>
+                    </div>
+                    <div class="vinylRow">
+                        <div class="vinylEx"><h3>Year:</h3></div>
+                        <h3>{{ vinyl.vinyl_year }}</h3>
+                    </div>
+                    <div class="vinylRow">
+                        <div class="vinylEx"><h3>Impact:</h3></div>
+                        <h3>{{ vinyl.vinyl_impact + "kg Co2" }}</h3>
+                    </div>
+                    <div class="vinylRow">
+                        <div class="vinylEx"><h3>Seller:</h3></div>
+                        <h3>{{ user.username }}</h3>
+                    </div>
+                </div>
+                    <div class="vinylStatContainer">
+                    <div class="statBoxTable">
+                        <h3>Stock:</h3>
+                        <h2>{{ vinyl.vinyl_stock }}</h2>
+                    </div>
+                    <div class="statBoxTable">
+                        <h3>Price:</h3>
+                        <h2>{{ "£" ~ "%.2f"|format(vinyl.vinyl_price) }}</h2>
+                    </div>
+                    <div class="statBoxTable">
+                        <a class="addToBasketButton" id="vinylAddBasketButton" href="{{ url_for('add_to_basket', id = vinyl.vinyl_id) }} " method="POST">Add to basket</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="vinylPageDescription">
+            <p>{{ vinyl.vinyl_description }}</p>
+        </div>
     </div>
 {% endblock %}

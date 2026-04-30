@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Login Example{% endblock %}
+
+{% block page_content %}
+    <div class="profile">
+        <div class="profileBar">
+            <img src="{{ url_for('static', filename='uploads/profile_pictures/' + current_user.profile_picture)}}">
+            <h1>{{ current_user.username.upper() }}</h1>
+            <div class="profileStats">
+                <div class="statBox">
+                    <h2>{{ "£" ~ current_user.balance }}</h2>
+                    <h3>Balance</h3>
+                </div>
+                <div class="statBox">
+                    <h2>{{ total_vinyls }}</h2>
+                    <h3>Vinyls for Sale</h3>
+                </div>
+                <div class="statBox" id="statLogout">
+                    <a href="{{ url_for('logout')}}"><h2>Log Out</h2></a>
+                </div>
+            </div>
+        </div>
+        <div class="profileVinyls">
+            {% for vinyl in vinyl %}
+                <div class = "vinyl">
+                    <a href="{{ url_for('Vinyl', id = vinyl.vinyl_id) }}">
+                    {% if vinyl.vinyl_image %}
+                        <img class="vinylImage" src = "{{ url_for('static', filename = 'uploads/' + vinyl.vinyl_image) }}">
+                    {% endif %}
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="vinylArtist">
+                                    {{ vinyl.vinyl_artist }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="vinylName">
+                                    {{ vinyl.vinyl_name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="vinylImpact">
+                                    {{ vinyl.vinyl_impact + "kg Co2" }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="vinylPrice">
+                                    {% if vinyl.vinyl_price %}
+                                        {{ "£" ~ "%.2f"|format(vinyl.vinyl_price) }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

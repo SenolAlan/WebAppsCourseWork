@@ -14,7 +14,7 @@ h1 {
 .navbar {
     background-color: whitesmoke;
     width: 100%;
-    height: 100px;
+    min-height: 100px;
 }
 
 .logo img {
@@ -26,9 +26,13 @@ h1 {
 
 .navbarContainer {
     display: flex;
-    height: 100%;
+    flex-wrap: wrap;
+    min-height: 100px;
+    min-width: 100%;
     align-items: center;
     justify-content: left;
+    flex-wrap: wrap;
+    background-color: whitesmoke;
 }
 
 .navbarNavigation {
@@ -94,9 +98,11 @@ h1 {
 
 .navbarSearchResults {
     display: grid;
-    position: relative;
-    max-width: 450px;
-    margin-left: 365px;
+    position: absolute;
+    top: 100px;
+    left: 365px;
+    min-width: 450px;
+    /*margin-left: 365px;*/
     padding: 0px;
     overflow-y: auto;
     height: auto;
@@ -109,13 +115,16 @@ h1 {
 
 }
 
+
 .navbarSearchResults.active {
     padding: 15px 25px 25px 25px;
     border-radius: 0px 0px 8px 8px;
+    
 }
 
 .navbarSearchResults.hidden {
-    opacity: 0;  
+    opacity: 0;
+    display: none;
 }
 
 .navbarSearchResults a {
@@ -206,6 +215,8 @@ h1 {
 
 .loginImg {
     height: 35px;
+    width: 35px;
+    border-radius: 50%;
 }
 
 
@@ -232,14 +243,16 @@ h1 {
 
 .header {
     padding-top: 40px;
-    margin-left: 40px;
+    margin-left: 50px;
+    max-width: 1400px;
 }
 
 .headerBox {
+    display: flex;
     padding: 10px 10px 10px 10px;
     border-radius: 15px 15px 0px 0px;
     background-color: rgb(29, 29, 29);
-    max-width: 350px;
+    max-width: 30%;
 }
 
 .header h1 {
@@ -386,7 +399,7 @@ h1 {
     padding: 10px 10px 10px 10px;
     border-radius: 15px 15px 0px 0px;
     background-color: rgb(29, 29, 29);
-    max-width: 350px;
+    max-width: 30%;
 }
 
 .searchHeaderBox h1 {
@@ -464,6 +477,7 @@ h1 {
     opacity: 1;
     transition: 0.2s;
     text-align: center;
+
 }
 
 .orderedResults.active {
@@ -489,6 +503,7 @@ h1 {
     justify-content: center;
     border: 0;
     margin-bottom: 10px;
+    border-radius: 8px;
 }
 
 #orderedResultImage {
@@ -497,4 +512,179 @@ h1 {
     height: 200px;
     width: auto;
     margin-bottom: 10px;
+}
+
+/* -----------------------------------------------------------------------*/
+/*                              PROFILE.HTML                              */
+/* -----------------------------------------------------------------------*/
+
+.profile {
+    width: 70%;
+    margin: auto;
+    margin-top: 40px;
+    padding: 20px;
+    background-color: whitesmoke;
+    border-radius: 8px;
+}
+
+.profileBar {
+    max-width: 100%;
+    display: flex;
+    padding: 20px;
+    background-color: rgb(225, 225, 225);
+    align-items: center;
+}
+
+.profileBar img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.profileBar h1 {
+    margin-left: 50px;
+}
+
+.profileStats {
+    margin-left: auto;
+    display: flex;
+}
+
+.statBox {
+    width: 200px;
+    text-align: center;
+    align-items: center;
+    padding: 20px;
+    margin: 20px;
+    background-color: whitesmoke;
+    border-radius: 8px;
+}
+
+.statBox h3 {
+    margin-right: 0;
+}
+
+#statLogout {
+    display: flex;
+    justify-content: center;
+}
+
+#statLogout a {
+    text-decoration: none;
+    color: rgb(29, 29, 29);
+}
+
+.profileVinyls {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgb(225, 225, 225);
+}
+
+.profileVinyls .vinyl {
+    margin: 10px 15px;
+}
+
+/* -----------------------------------------------------------------------*/
+/*                              VINYL.HTML                                */
+/* -----------------------------------------------------------------------*/
+
+.vinylPageContainer {
+    width: 70%;
+    margin: auto;
+    margin-top: 40px;
+    padding: 20px;
+    background-color: whitesmoke;
+}
+
+.vinylPageHeader {
+    display: flex;
+    align-items: flex-start;
+}
+
+.vinylPageImage {
+    height: 330px;
+    width: auto;
+}
+
+.vinylTableContainer {
+    height: 100%;
+    width: 100%;
+    margin-left: 20px;
+}
+
+.vinylTable {
+    display: block;
+}
+
+.vinylRow {
+    display: flex;
+    margin: 0px;
+    margin-bottom: 20px;
+    margin-top: 0px;
+}
+
+.vinylRow h2, h3{
+    margin: 0px;
+    margin-right: 20px;
+
+}
+
+.vinylRow h2 {
+    font-size: 30px;
+}
+
+.vinylRow h3 {
+    font-size: 20px;
+    font-weight: 100;
+}
+
+.vinylEx {
+    width: 90px;
+}
+
+.vinylStatContainer {
+    max-width: 100%;
+    height: auto;
+    padding: 10px;
+    background-color: rgb(225, 225, 225);
+    text-align: center;
+    align-items: center;
+    display: flex;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.statBoxTable {
+    display: flex;
+    width: 200px;
+    height: 80px;
+    justify-content: center; 
+    align-items: center;
+    background-color: whitesmoke;
+    border-radius: 8px;
+    margin: 0px 10px;
+}
+
+.statBoxTable h2 {
+    font-size: 20px;
+    font-weight: 100;
+}
+
+#vinylAddBasketButton {
+    display: flex;
+    width: 100%;
+    min-height: 100%;
+    justify-content: center; 
+    align-items: center;
+    background-color: whitesmoke;
+    text-decoration: none;
+    transition: 0.2s;
+    padding: 0;
+}
+
+#vinylAddBasketButton:hover {
+    background-color: rgb(29, 29, 29);
 }

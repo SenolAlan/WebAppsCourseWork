@@ -1,11 +1,11 @@
-from flask import Flask, render_template, redirect, request, session, url_for
+from flask import Flask, flash, render_template, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import *
 from wtforms.validators import *
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
@@ -13,15 +13,39 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'top secret!'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vinyls.db'
-#app.config["SQLALCHEMY_BINDS"] = {"users": "sqlite:///users.db", "vinyls": "sqlite:///vinyls.db"}
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 lm = LoginManager(app)
 lm.login_view = 'login'
 
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(16), index=True, unique=True)
+    password_hash = db.Column(db.String(64))
+    profile_picture = db.Column(db.String(64))
+    balance = db.Column(db.Integer)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    @staticmethod
+    def register(username, password, profile_picture):
+        user = User(username = username)
+        user.set_password(password)
+        user.profile_picture = profile_picture
+        user.balance = 0
+        db.session.add(user)
+        db.session.commit()
+        return user
+
+    def __repr__(self):
+        return '<User {0}>'.format(self.username)
+
 class VinylsDb(db.Model):
-    #__bind_key__ = "vinyls"
     __tablename__ = 'VinylsDb'
     vinyl_id = db.Column(db.Integer, primary_key=True)
     vinyl_artist = db.Column(db.String(32))
@@ -32,14 +56,16 @@ class VinylsDb(db.Model):
     vinyl_price = db.Column(db.Float, nullable=True)
     vinyl_impact = db.Column(db.String(32))
     vinyl_stock = db.Column(db.Integer)
+    vinyl_owner = db.Column(db.Integer)
+    tracks = db.relationship('Track', backref='vinyl')
 
 class VinylForm(FlaskForm):
     vinyl_artist = StringField('Artist Name', validators = [DataRequired(), Length(min = 3, max = 30)])
     vinyl_name = StringField('Vinyl Name', validators = [DataRequired(), Length(min = 3, max = 30)])
     vinyl_genre = StringField('Vinyl Genre', validators = [DataRequired(), Length(min = 3, max = 30)])
     vinyl_year = IntegerField('Vinyl Year', validators = [data_required(), NumberRange(min = 1900, max = 2100)])
-    vinyl_image = FileField('Vinyl Image', validators= [FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')])
-    vinyl_price = FloatField('Vinyl Price', validators = [NumberRange(min = 1, max = 2000)])
+    vinyl_image = FileField('Vinyl Image', validators= [DataRequired(), FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')])
+    vinyl_price = FloatField('Vinyl Price', validators = [DataRequired(), NumberRange(min = 1, max = 2000)])
     vinyl_impact = StringField('Vinyl Impact', validators = [DataRequired(), Length(min = 0, max = 5)])
     vinyl_stock = IntegerField('Vinyl Stock', validators = [data_required(), NumberRange(min = 0, max = 100)])
     submit = SubmitField('Submit')
@@ -54,30 +80,20 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Submit')
 
-class User(UserMixin, db.Model):
-    #__bind_key__ = "users"
-    __tablename__ = 'users'
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(3, 16)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    profile_picture = FileField('Profile Picture', validators= [FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')])
+    submit = SubmitField('Submit')
+
+class Track(db.Model):
+    __tablename__ = 'Track'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(16), index=True, unique=True)
-    password_hash = db.Column(db.String(64))
+    track_name = db.Column(db.String(100), nullable=False)
+    track_length = db.Column(db.String(10), nullable=False)  # e.g. "3:45"
+    vinyl_id = db.Column(db.Integer, db.ForeignKey('VinylsDb.vinyl_id'), nullable=False)
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
 
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
-    
-    @staticmethod
-    def register(username, password):
-        user = User(username=username)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        return user
-
-    def __repr__(self):
-        return '<User {0}>'.format(self.username)
-    
 @lm.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -86,12 +102,33 @@ def load_user(id):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username = form.username.data).first()
         if user is None or not user.verify_password(form.password.data):
-            return redirect(url_for('login', **request.args))
+            flash("Incorrect details")
+            return redirect(url_for('login'))
         login_user(user, form.remember_me.data)
         return redirect(request.args.get('next') or url_for('index'))
     return render_template('login.html', form = form)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(username = form.username.data).first()
+        if existing_user:
+            return redirect(url_for('login'))
+        profile_file = form.profile_picture.data
+        profile_filename = None
+        if profile_file:
+            profile_filename = profile_file.filename
+            profile_file.save(os.path.join('static/uploads/profile_pictures', profile_filename))
+            user = User.register(form.username.data, form.password.data, profile_filename)
+        else:
+            user = User.register(form.username.data, form.password.data, 'Profile.png')
+        login_user(user)
+        return redirect(url_for('index'))
+
+    return render_template('register.html', form = form)
 
 @app.route('/logout')
 @login_required
@@ -103,6 +140,14 @@ def logout():
 @login_required
 def protected():
     return render_template('protected.html')
+
+@app.route('/profile')
+@login_required
+def profile():
+    total_vinyls = VinylsDb.query.filter(VinylsDb.vinyl_owner == current_user.id).count()
+
+    vinyl = VinylsDb.query.filter(VinylsDb.vinyl_owner == current_user.id)
+    return render_template('profile.html', total_vinyls = total_vinyls, vinyl = vinyl)
     
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -116,7 +161,7 @@ def search():
     query = request.args.get("q", "")
 
     if query:
-        results = VinylsDb.query.filter(db.or_(VinylsDb.vinyl_artist.ilike(f"%{query}%"), VinylsDb.vinyl_name.ilike(f"%{query}%"))).all()
+        results = VinylsDb.query.filter(db.or_(VinylsDb.vinyl_artist.ilike(f"%{query}%"), VinylsDb.vinyl_name.ilike(f"%{query}%"))).limit(15).all()
         return [{"img": v.vinyl_image, "id": v.vinyl_id, "name": v.vinyl_name, "artist": v.vinyl_artist, "impact": v.vinyl_impact, "id": v.vinyl_id} for v in results]
     
 @app.route('/orderedSort')
@@ -146,8 +191,8 @@ def orderedSort():
 @app.route('/release/<int:id>')
 def Vinyl(id):
     vinyl = VinylsDb.query.get_or_404(id)
-    
-    return render_template('release.html', vinyl = vinyl)
+    vinyl_owner = User.query.get(vinyl.vinyl_owner)
+    return render_template('release.html', vinyl = vinyl, user = vinyl_owner)
 
 @app.route('/basket')
 def basket():
@@ -175,16 +220,18 @@ def basket():
 def add_to_basket(id):
     basket = session.get('basket', {})
     id = str(id)
+    vinyl = db.session.get(VinylsDb, int(id))
 
     if id in basket:
-        basket[id] += 1
+        if basket[id] < vinyl.vinyl_stock:
+            basket[id] += 1
     else:
         basket[id] = 1
 
     session['basket'] = basket
     session.modified = True
 
-    return redirect('/')
+    return redirect(request.referrer)
 
 @app.route('/basket/increase/<int:id>', methods=['POST'])
 def increase(id):
@@ -229,6 +276,7 @@ def remove(id):
     return redirect('/')
 
 @app.route('/add', methods=['GET', 'POST'])
+@login_required
 def AddVinyl():
     form = VinylForm()
     if form.validate_on_submit():
@@ -243,7 +291,9 @@ def AddVinyl():
             vinyl_genre = form.vinyl_genre.data,
             vinyl_year = form.vinyl_year.data,
             vinyl_image = image_filename,
-            vinyl_price = form.vinyl_price.data
+            vinyl_price = form.vinyl_price.data,
+            vinyl_stock = form.vinyl_stock.data,
+            vinyl_owner = current_user.id
         )
         db.session.add(newVinyl)
         db.session.commit()
@@ -251,6 +301,7 @@ def AddVinyl():
     return render_template('add.html', form=form)
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def EditVinyl(id):
     vinyl = VinylsDb.query.get_or_404(id)
     form = VinylForm(obj = vinyl)
@@ -279,13 +330,5 @@ def RemoveVinyl():
     return render_template('remove.html', form=form)
 
 
-
-
-
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        db.session.add(User(...))
-        db.session.add(VinylsDb(...))
-        db.session.commit()
     app.run(debug=True,port=5050)
